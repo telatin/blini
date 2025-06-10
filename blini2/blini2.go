@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"iter"
 	"os"
 	"runtime/debug"
 	"slices"
@@ -34,8 +35,8 @@ TODO
 */
 
 const (
-	kmerLen = 21
-	scale   = 50
+	kmerLen  = 21
+	idxScale = 5
 
 	useMyDist   = true     // Use a new experiemental distance func.
 	indexSuffix = ".blini" // Suffix of pre-sketched files.
@@ -46,15 +47,13 @@ var (
 	rFile  = flag.String("r", "", "Reference file")
 	oFile  = flag.String("o", "", "Output file or prefix")
 	contn  = flag.Bool("c", false, "Use containment rather than full match")
-	minSim = flag.Float64("s", 0.9, "Minimum similarity for match")
+	minSim = flag.Float64("m", 0.9, "Minimum similarity for match")
+	scale  = flag.Uint64("s", 200, "Use 1/`ratio` of the kmers")
 )
 
 func main() {
 	flag.Parse()
 	fmt.Println("Let's go!")
-	fmt.Println("K:      ", kmerLen)
-	fmt.Println("Min sim:", *minSim)
-	fmt.Println("Scale:  ", scale)
 	debug.SetGCPercent(20)
 
 	var err error
@@ -75,25 +74,25 @@ func mainSearch() error {
 	fmt.Println("----------------")
 	fmt.Println("SEARCH OPERATION")
 	fmt.Println("----------------")
-	var skch [][]uint64
-	var lens []int
-	var names []string
+	var sk sketches
 	var err error
 	if strings.HasSuffix(*rFile, indexSuffix) {
 		fmt.Println("Reading prepared sketches")
-		skch, lens, names, err = readSketches(*rFile)
+		sk, err = collectSketches(readSketches(*rFile))
 	} else {
 		fmt.Println("Sketching reference sequences")
-		skch, lens, names, err = sketchFile(*rFile)
+		sk, err = collectSketches(sketchFile(*rFile))
 	}
 	if err != nil {
 		return err
 	}
+	fmt.Println("Scale:", sk.scale)
+	fmt.Println("Min sim:", *minSim)
 
 	fmt.Println("Indexing")
 	pt := ptimer.New()
-	idx := sketching.NewIndex(scale * 10)
-	for i, s := range skch {
+	idx := sketching.NewIndex(sk.scale * idxScale)
+	for i, s := range sk.skch {
 		idx.Add(s, i)
 		pt.Inc()
 	}
@@ -108,16 +107,19 @@ func mainSearch() error {
 		if err != nil {
 			return err
 		}
-		s := sketching.Sketch(fa.Sequence, kmerLen, scale)
+		// if len(fa.Sequence) < 10000 {
+		// 	continue
+		// }
+		s := sketching.Sketch(fa.Sequence, kmerLen, sk.scale)
 		for _, f := range idx.Search(s) {
-			sim := 1 - mash.FromJaccard(dist(s, skch[f]), kmerLen)
+			sim := 1 - mash.FromJaccard(dist(s, sk.skch[f]), kmerLen)
 			if useMyDist {
-				sim = 1 - myDist(s, skch[f], len(fa.Sequence), lens[f])
+				sim = 1 - myDist(s, sk.skch[f], len(fa.Sequence), sk.lens[f])
 			}
 			if sim >= *minSim {
 				matches = append(matches, fmt.Sprintf(
 					"(%.0f%%) %s >>>>> %s",
-					sim*100, fa.Name, names[f]))
+					sim*100, fa.Name, sk.names[f]))
 			}
 		}
 		pt.Inc()
@@ -135,16 +137,19 @@ func mainCluster() error {
 	fmt.Println("--------------------")
 	fmt.Println("CLUSTERING OPERATION")
 	fmt.Println("--------------------")
+	fmt.Println("Scale:", *scale)
+	fmt.Println("Min sim:", *minSim)
+
 	fmt.Println("Sketching sequences")
-	skch, lens, names, err := sketchFile(*qFile)
+	sk, err := collectSketches(sketchFile(*qFile))
 	if err != nil {
 		return err
 	}
 
 	fmt.Println("Indexing")
 	pt := ptimer.New()
-	idx := sketching.NewIndex(scale * 10)
-	for i, s := range skch {
+	idx := sketching.NewIndex(*scale * idxScale)
+	for i, s := range sk.skch {
 		idx.Add(s, i)
 		pt.Inc()
 	}
@@ -153,8 +158,8 @@ func mainCluster() error {
 	idx.Clean()
 
 	fmt.Println("Clustering")
-	perm := sortedPerm(len(lens), func(i, j int) int {
-		return cmp.Compare(lens[j], lens[i])
+	perm := sortedPerm(len(sk.lens), func(i, j int) int {
+		return cmp.Compare(sk.lens[j], sk.lens[i])
 	})
 	friends := 0
 	var clusters [][]int
@@ -162,30 +167,30 @@ func mainCluster() error {
 		return fmt.Sprintf("%d (%dc %df)", i, len(clusters), friends/i)
 	})
 	for _, i := range perm {
-		s := skch[i]
+		s := sk.skch[i]
 		if s == nil {
 			pt.Inc()
 			continue
 		}
-		skch[i] = nil
+		sk.skch[i] = nil
 		fr := idx.Search(s)
 		friends += len(fr)
 
 		// Create cluster.
 		c := []int{i}
 		for _, f := range fr {
-			if skch[f] == nil {
+			if sk.skch[f] == nil {
 				continue
 			}
-			sim := 1 - mash.FromJaccard(dist(skch[f], s), kmerLen)
+			sim := 1 - mash.FromJaccard(dist(sk.skch[f], s), kmerLen)
 			if useMyDist {
-				sim = 1 - myDist(skch[f], s, lens[f], lens[i])
+				sim = 1 - myDist(sk.skch[f], s, sk.lens[f], sk.lens[i])
 			}
 			if sim < *minSim {
 				continue
 			}
 			c = append(c, f)
-			skch[f] = nil
+			sk.skch[f] = nil
 		}
 		clusters = append(clusters, c)
 		pt.Inc()
@@ -218,7 +223,7 @@ func mainCluster() error {
 	// Create clusters by names.
 	byName := snm.SliceToSlice(clusters, func(c []int) []string {
 		return snm.SliceToSlice(c, func(i int) string {
-			return names[i]
+			return sk.names[i]
 		})
 	})
 
@@ -240,11 +245,8 @@ func mainSketch() error {
 	fmt.Println("----------------")
 	fmt.Println("SKETCH OPERATION")
 	fmt.Println("----------------")
-	fmt.Println("Sketching sequences")
-	skch, lens, names, err := sketchFile(*rFile)
-	if err != nil {
-		return err
-	}
+	fmt.Println("Scale:", *scale)
+
 	if !strings.HasSuffix(*oFile, indexSuffix) {
 		*oFile += indexSuffix
 	}
@@ -255,61 +257,64 @@ func mainSketch() error {
 	}
 	defer f.Close()
 
-	for i := range skch {
-		err := bnry.Write(f, skch[i], lens[i], names[i])
+	fmt.Println("Sketching sequences")
+	pt := ptimer.New()
+	for e, err := range sketchFile(*rFile) {
 		if err != nil {
 			return err
 		}
-	}
-	return nil
-}
-
-func sketchFile(file string) ([][]uint64, []int, []string, error) {
-	pt := ptimer.New()
-	var skch [][]uint64
-	var lens []int
-	var names []string
-	for fa, err := range fasta.File(file) {
-		if err != nil {
-			return nil, nil, nil, err
+		if err := bnry.Write(f, e.s, e.ln, e.name, e.scale); err != nil {
+			return err
 		}
-		skch = append(skch, sketching.Sketch(fa.Sequence, kmerLen, scale))
-		lens = append(lens, len(fa.Sequence))
-		names = append(names, string(fa.Name))
 		pt.Inc()
 	}
 	pt.Done()
-
-	return skch, lens, names, nil
+	return nil
 }
 
-func readSketches(file string) ([][]uint64, []int, []string, error) {
-	f, err := aio.Open(file)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	defer f.Close()
-	var skch [][]uint64
-	var lens []int
-	var names []string
-
-	for {
-		var s []uint64
-		var l int
-		var n string
-		err := bnry.Read(f, &s, &l, &n)
-		if err != nil {
-			if err == io.EOF {
-				break
+func sketchFile(file string) iter.Seq2[sketchEntry, error] {
+	return func(yield func(sketchEntry, error) bool) {
+		for fa, err := range fasta.File(file) {
+			if err != nil {
+				yield(sketchEntry{}, err)
+				return
 			}
-			return nil, nil, nil, err
+			var e sketchEntry
+			e.s = sketching.Sketch(fa.Sequence, kmerLen, *scale)
+			e.ln = len(fa.Sequence)
+			e.name = string(fa.Name)
+			e.scale = *scale
+			if !yield(e, nil) {
+				return
+			}
 		}
-		skch = append(skch, s)
-		lens = append(lens, l)
-		names = append(names, n)
 	}
+}
 
-	return skch, lens, names, err
+func readSketches(file string) iter.Seq2[sketchEntry, error] {
+	return func(yield func(sketchEntry, error) bool) {
+		f, err := aio.Open(file)
+		if err != nil {
+			yield(sketchEntry{}, err)
+			return
+		}
+		defer f.Close()
+
+		for {
+			var e sketchEntry
+			err := bnry.Read(f, &e.s, &e.ln, &e.name, &e.scale)
+			if err != nil {
+				if err == io.EOF {
+					return
+				}
+				yield(sketchEntry{}, err)
+				return
+			}
+			if !yield(e, nil) {
+				return
+			}
+		}
+	}
 }
 
 func dist(a, b []uint64) float64 {
@@ -330,4 +335,44 @@ func myDist(a, b []uint64, alen, blen int) float64 {
 
 func sortedPerm(n int, cmp func(i, j int) int) []int {
 	return snm.SortedFunc(snm.Slice(n, func(i int) int { return i }), cmp)
+}
+
+type sketches struct {
+	skch  [][]uint64
+	lens  []int
+	names []string
+	scale uint64
+}
+
+type sketchEntry struct {
+	s     []uint64
+	ln    int
+	name  string
+	scale uint64
+}
+
+func collectSketches(seq iter.Seq2[sketchEntry, error]) (sketches, error) {
+	skch := sketches{}
+	first := true
+	pt := ptimer.New()
+	for s, err := range seq {
+		if err != nil {
+			return skch, err
+		}
+		if first {
+			skch.scale = s.scale
+			first = false
+		} else {
+			if s.scale != skch.scale {
+				return skch, fmt.Errorf("mismatching scales: %d, %d",
+					skch.scale, s.scale)
+			}
+		}
+		skch.skch = append(skch.skch, s.s)
+		skch.lens = append(skch.lens, s.ln)
+		skch.names = append(skch.names, s.name)
+		pt.Inc()
+	}
+	pt.Done()
+	return skch, nil
 }
