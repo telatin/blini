@@ -11,6 +11,7 @@ import (
 	"golang.org/x/exp/maps"
 )
 
+// Sketch returns a sketch with 1/scale kmer hashes/
 func Sketch(seq []byte, k int, scale uint64) []uint64 {
 	seq = bytes.ToUpper(seq)
 	hashes := make(sets.Set[uint64], len(seq)/int(scale))

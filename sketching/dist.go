@@ -7,6 +7,7 @@ const (
 	compensatingCont = true
 )
 
+// Counts the common elements in a and b, assuming they are both sorted.
 func common(a, b []uint64) int {
 	c, i, j := 0, 0, 0
 	for i < len(a) && j < len(b) {
@@ -23,12 +24,15 @@ func common(a, b []uint64) int {
 	return c
 }
 
+// Jaccard returns the Jaccard similarity between a and b.
 func Jaccard(a, b []uint64) float64 {
 	i := common(a, b)
 	u := len(a) + len(b) - i
 	return float64(i) / float64(u)
 }
 
+// Containment returns a Jaccard-like similarity for the containment
+// of a in b.
 func Containment(a, b []uint64) float64 {
 	i := common(a, b)
 	if compensatingCont {
@@ -38,6 +42,8 @@ func Containment(a, b []uint64) float64 {
 	}
 }
 
+// MyDist returns a Mash distance with compensation for length
+// difference.
 func MyDist(a, b []uint64, alen, blen int, k int) float64 {
 	if alen > blen { // a should be the smaller.
 		a, b = b, a

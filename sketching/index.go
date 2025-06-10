@@ -9,11 +9,13 @@ import (
 	"golang.org/x/exp/maps"
 )
 
+// Index allows quick lookups for sketches.
 type Index struct {
 	idx map[uint64][]int
 	mx  uint64
 }
 
+// NewIndex returns a new index that stores 1/scale of hashes.
 func NewIndex(scale uint64) *Index {
 	return &Index{
 		idx: map[uint64][]int{},
@@ -21,6 +23,7 @@ func NewIndex(scale uint64) *Index {
 	}
 }
 
+// Add adds the given sketch with the given serial number.
 func (idx *Index) Add(s []uint64, i int) {
 	for _, x := range s {
 		if x > idx.mx {
@@ -30,6 +33,8 @@ func (idx *Index) Add(s []uint64, i int) {
 	}
 }
 
+// Search returns serial numbers of sketches that share hashes with
+// the given sketch.
 func (idx *Index) Search(s []uint64) []int {
 	set := sets.Set[int]{}
 	for _, x := range s {
@@ -41,6 +46,8 @@ func (idx *Index) Search(s []uint64) []int {
 	return maps.Keys(set)
 }
 
+// Clean removes keys with only one element.
+// Use only for clustering.
 func (idx *Index) Clean() {
 	n1 := len(idx.idx)
 	idx.idx = snm.FilterMap(idx.idx, func(k uint64, v []int) bool {
