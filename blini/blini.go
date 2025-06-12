@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"cmp"
+	"encoding/csv"
 	"flag"
 	"fmt"
 	"io"
@@ -28,7 +30,6 @@ TODO
 - Document functions
 - Add representative output to cluster
 - Finalize output of search
-- Flag for scale?
 - Break down this file for each main
 - Tests for sketching and for common
 - Grouping by file, by regex?
@@ -53,7 +54,6 @@ var (
 
 func main() {
 	flag.Parse()
-	fmt.Println("Let's go!")
 	debug.SetGCPercent(20)
 
 	var err error
@@ -99,17 +99,16 @@ func mainSearch() error {
 	pt.Done()
 
 	fmt.Println("Searching")
-	var matches []string
+	buf := bytes.NewBuffer(nil)
+	out := csv.NewWriter(buf)
+	var matches int
 	pt = ptimer.NewFunc(func(i int) string {
-		return fmt.Sprintf("%d (%d matched)", i, len(matches))
+		return fmt.Sprintf("%d (%d matches)", i, matches)
 	})
 	for fa, err := range fasta.File(*qFile) {
 		if err != nil {
 			return err
 		}
-		// if len(fa.Sequence) < 10000 {
-		// 	continue
-		// }
 		s := sketching.Sketch(fa.Sequence, kmerLen, sk.scale)
 		for _, f := range idx.Search(s) {
 			sim := 1 - mash.FromJaccard(dist(s, sk.skch[f]), kmerLen)
@@ -117,18 +116,21 @@ func mainSearch() error {
 				sim = 1 - myDist(s, sk.skch[f], len(fa.Sequence), sk.lens[f])
 			}
 			if sim >= *minSim {
-				matches = append(matches, fmt.Sprintf(
-					"(%.0f%%) %s >>>>> %s",
-					sim*100, fa.Name, sk.names[f]))
+				matches++
+				output := []string{
+					fmt.Sprintf("%.0f%%", sim*100),
+					string(fa.Name),
+					sk.names[f],
+				}
+				out.Write(output)
 			}
 		}
 		pt.Inc()
 	}
 	pt.Done()
 
-	for _, m := range matches {
-		fmt.Println(m)
-	}
+	out.Flush()
+	fmt.Printf("%s", buf.Bytes())
 
 	return nil
 }
