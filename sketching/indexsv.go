@@ -1,4 +1,4 @@
-//go:build oldmap
+//go:build !oldmap
 
 package sketching
 
@@ -7,20 +7,19 @@ import (
 	"math"
 
 	"github.com/fluhus/gostuff/sets"
-	"github.com/fluhus/gostuff/snm"
 	"golang.org/x/exp/maps"
 )
 
 // Index allows quick lookups for sketches.
 type Index struct {
-	idx map[uint64][]int
+	idx svmap[uint64, int]
 	mx  uint64
 }
 
 // NewIndex returns a new index that stores 1/scale of hashes.
 func NewIndex(scale uint64) *Index {
 	return &Index{
-		idx: map[uint64][]int{},
+		idx: newSVMap[uint64, int](),
 		mx:  math.MaxUint64 / scale,
 	}
 }
@@ -31,7 +30,7 @@ func (idx *Index) Add(s []uint64, i int) {
 		if x > idx.mx {
 			break
 		}
-		idx.idx[x] = append(idx.idx[x], i)
+		idx.idx.put(x, i)
 	}
 }
 
@@ -43,7 +42,7 @@ func (idx *Index) Search(s []uint64) []int {
 		if x > idx.mx {
 			break
 		}
-		set.Add(idx.idx[x]...)
+		set.Add(idx.idx.get(x)...)
 	}
 	return maps.Keys(set)
 }
@@ -51,11 +50,9 @@ func (idx *Index) Search(s []uint64) []int {
 // Clean removes keys with only one element.
 // Use only for clustering.
 func (idx *Index) Clean() {
-	n1 := len(idx.idx)
-	idx.idx = snm.FilterMap(idx.idx, func(k uint64, v []int) bool {
-		return len(v) > 1
-	})
-	n2 := len(idx.idx)
+	n1 := len(idx.idx.singles)
+	n2 := len(idx.idx.slices)
+	idx.idx.singles = nil
 	fmt.Printf("Cleaning: %d ==> %d (%.0f%%)\n",
 		n1, n2, float64(n2)/float64(n1)*100)
 }
