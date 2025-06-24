@@ -10,7 +10,7 @@ zip -j build/blini_linux_amd64.zip build/blini
 
 # Mac
 GOOS=darwin GOARCH=arm64 go build -o build ./blini
-zip -j build/blini_macos_arm64.zip build/blini
+zip -j build/blini_mac_arm64.zip build/blini
 
 # Windows
 GOOS=windows go build -o build ./blini

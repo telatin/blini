@@ -3,3 +3,12 @@
 
 # Build outputs
 build/
+
+# Experimental stuff
+x/
+
+# Temporary outputs
+tmp*
+
+# Generated test data
+publication/testdata/

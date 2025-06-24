@@ -4,7 +4,7 @@ go 1.24
 
 require (
 	github.com/fluhus/biostuff v1.2.1-0.20250530221512-3d864f1a8120
-	github.com/fluhus/gostuff v1.1.0
+	github.com/fluhus/gostuff v1.2.1-0.20250624195102-8f888def4674
 	golang.org/x/exp v0.0.0-20250228200357-dead58393ab7
 )
 
