@@ -8,8 +8,10 @@ import (
 	"maps"
 	"slices"
 
+	"github.com/fluhus/biostuff/formats/fasta"
 	"github.com/fluhus/biostuff/mash/v2"
 	"github.com/fluhus/blini/sketching"
+	"github.com/fluhus/gostuff/aio"
 	"github.com/fluhus/gostuff/jio"
 	"github.com/fluhus/gostuff/ptimer"
 	"github.com/fluhus/gostuff/sets"
@@ -98,7 +100,7 @@ func mainCluster() error {
 
 	// Sort clusters for deterministic output.
 	for _, c := range clusters {
-		slices.Sort(c)
+		slices.Sort(c[1:]) // First element is the representative.
 	}
 	slices.SortFunc(clusters, func(a, b []int) int {
 		return cmp.Compare(a[0], b[0])
@@ -112,6 +114,8 @@ func mainCluster() error {
 	})
 
 	if *oFile != "" {
+		fmt.Println("Generating output")
+		// JSON output.
 		output := map[string]any{
 			"byNumber": clusters,
 			"byName":   byName,
@@ -119,7 +123,30 @@ func mainCluster() error {
 		if err := jio.Write(*oFile+".json", output); err != nil {
 			return err
 		}
-		// TODO(fluhus): Add fasta output.
+
+		// Fasta output.
+		reps := snm.SliceToSlice(clusters, func(a []int) int { return a[0] })
+		fout, err := aio.Create(*oFile + ".fasta")
+		if err != nil {
+			return err
+		}
+		defer fout.Close()
+		i := -1
+		for fa, err := range fasta.File(*qFile) {
+			if err != nil {
+				return err
+			}
+			if len(reps) == 0 {
+				break
+			}
+			i++
+			if i == reps[0] {
+				if err := fa.Write(fout); err != nil {
+					return err
+				}
+				reps = reps[1:]
+			}
+		}
 	} else {
 		fmt.Println("No output")
 	}
