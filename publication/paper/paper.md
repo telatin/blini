@@ -6,11 +6,13 @@ tags:
   - microbiome
 authors:
   - name: Amit Lavon
+    orcid: 0000-0003-3928-5907
+    corresponding: true
     affiliation: '1'
 affiliations:
   - index: 1
     name: University of California, Irvine, CA, USA
-date: 23 June 2025
+date: 24 June 2025
 bibliography: paper.bib
 ---
 
@@ -128,8 +130,8 @@ this tool might not be suitable for short reads.
 Blini currently only works for nucleotide sequences.
 Amino acid sequences might be added in the future.
 
-Blini is currently single threaded.
-Multithreading can be considered if a concrete need arises.
+Blini is currently single-threaded.
+Multithreading can be considered in the future if a concrete need arises.
 
 # References
 
