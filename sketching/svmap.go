@@ -25,11 +25,17 @@ func (s svmap[K, V]) put(k K, v V) {
 
 // Returns the slice associated in k.
 func (s svmap[K, V]) get(k K) []V {
-	if s.singles == nil {
-		return s.slices[k]
-	}
 	if v, ok := s.singles[k]; ok {
 		return append([]V{v}, s.slices[k]...)
 	}
 	return nil
+}
+
+// Removes keys with one value.
+func (s svmap[K, V]) clearSingles() {
+	for k := range s.singles {
+		if s.slices[k] == nil {
+			delete(s.singles, k)
+		}
+	}
 }

@@ -14,17 +14,24 @@ func TestSVMap(t *testing.T) {
 	s.put(5, 90)
 
 	tests := []struct {
-		k    int
-		want []int
+		k         int
+		want      []int
+		wantClear []int
 	}{
-		{3, []int{55}},
-		{5, []int{31, 12, 90}},
-		{6, []int{90}},
-		{7, nil},
+		{3, []int{55}, nil},
+		{5, []int{31, 12, 90}, []int{31, 12, 90}},
+		{6, []int{90}, nil},
+		{7, nil, nil},
 	}
 	for _, test := range tests {
 		if got := s.get(test.k); !slices.Equal(got, test.want) {
 			t.Errorf("get(%d)=%d, want %d", test.k, got, test.want)
+		}
+	}
+	s.clearSingles()
+	for _, test := range tests {
+		if got := s.get(test.k); !slices.Equal(got, test.wantClear) {
+			t.Errorf("get(%d)=%d, want %d", test.k, got, test.wantClear)
 		}
 	}
 }
