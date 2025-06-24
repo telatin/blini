@@ -7,7 +7,6 @@ tags:
 authors:
   - name: Amit Lavon
     orcid: 0000-0003-3928-5907
-    corresponding: true
     affiliation: '1'
 affiliations:
   - index: 1
@@ -22,7 +21,7 @@ Blini is a tool for quick lookup of nucleotide sequences in databases,
 and for quick dereplication of sequence collections.
 It is meant to help cleaning and characterizing large collections
 of sequences that would otherwise be too big to search with
-BLAST [@altschul1990basic] or too demanding for a local machine to handle,
+BLAST [@altschul1990basic] or too demanding for a local machine to process,
 for example with Sourmash [@brown2016sourmash] or with MMseqs
 [@steinegger2018clustering].
 Blini is designed to be fast and have a small memory footprint,
