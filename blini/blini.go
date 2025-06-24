@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"cmp"
 	"encoding/csv"
 	"flag"
@@ -37,7 +36,7 @@ TODO
 
 const (
 	kmerLen  = 21
-	idxScale = 5
+	idxScale = 4
 
 	useMyDist   = true     // Use a new experiemental distance func.
 	indexSuffix = ".blini" // Suffix of pre-sketched files.
@@ -99,8 +98,22 @@ func mainSearch() error {
 	pt.Done()
 
 	fmt.Println("Searching")
-	buf := bytes.NewBuffer(nil)
-	out := csv.NewWriter(buf)
+	var fout io.Writer
+	if *oFile != "" {
+		f, err := aio.Create(*oFile)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		fout = f
+	} else {
+		fout = io.Discard
+	}
+	out := csv.NewWriter(fout)
+	defer out.Flush()
+
+	out.Write([]string{"similarity", "query", "reference"})
+
 	var matches int
 	pt = ptimer.NewFunc(func(i int) string {
 		return fmt.Sprintf("%d (%d matches)", i, matches)
@@ -128,9 +141,6 @@ func mainSearch() error {
 		pt.Inc()
 	}
 	pt.Done()
-
-	out.Flush()
-	fmt.Printf("%s", buf.Bytes())
 
 	return nil
 }
@@ -199,7 +209,7 @@ func mainCluster() error {
 	}
 	pt.Done()
 
-	{
+	{ // TODO(fluhus): Organize this code.
 		alli := sets.Set[int]{}
 		lens := 0
 		for _, c := range clusters {
@@ -230,12 +240,14 @@ func mainCluster() error {
 	})
 
 	if *oFile != "" {
-		if err := jio.Write(*oFile+"_bynumber.json", clusters); err != nil {
+		output := map[string]any{
+			"byNumber": clusters,
+			"byName":   byName,
+		}
+		if err := jio.Write(*oFile+".json", output); err != nil {
 			return err
 		}
-		if err := jio.Write(*oFile+"_byname.json", byName); err != nil {
-			return err
-		}
+		// TODO(fluhus): Add fasta output.
 	} else {
 		fmt.Println("No output")
 	}
