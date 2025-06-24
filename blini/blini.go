@@ -12,8 +12,6 @@ import (
 
 /*
 TODO
-- Document functions
-- Add representative output to cluster
 - Make ptimer output to stdout
 - Tests for sketching and for common
 - Grouping by file, by regex?
@@ -33,7 +31,7 @@ var (
 	oFile  = flag.String("o", "", "Output file or prefix")
 	contn  = flag.Bool("c", false, "Use containment rather than full match")
 	minSim = flag.Float64("m", 0.9, "Minimum similarity for match")
-	scale  = flag.Uint64("s", 200, "Use 1/`ratio` of the kmers")
+	scale  = flag.Uint64("s", 200, "Use 1/`scale` of the kmers")
 )
 
 func main() {
@@ -47,6 +45,11 @@ func main() {
 		err = mainCluster()
 	} else if *rFile != "" {
 		err = mainSketch()
+	} else {
+		fmt.Println("Please select -q for clustering, -r for sketching,",
+			"or both for searching.")
+		flag.PrintDefaults()
+		os.Exit(1)
 	}
 	if err != nil {
 		fmt.Println("ERROR:", err)
