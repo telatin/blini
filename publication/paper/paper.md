@@ -36,7 +36,7 @@ Metagenomes are collections of genetic material from various organisms,
 which are often not initially known.
 Characterizing the taxonomic makeup of a sample involves searching
 its contents in large databases in order to find which organism
-matches a certain nucleotide sequence.
+matches each nucleotide sequence.
 Assembled sequences can reach lengths of millions of bases,
 making alignment-based search methods too cumbersome.
 Such big queries are often outsourced to powerful cloud-based
