@@ -2,7 +2,10 @@
 // distance calculation functionality.
 package sketching
 
-import "github.com/fluhus/biostuff/mash"
+import (
+	"github.com/fluhus/biostuff/mash"
+	"github.com/fluhus/gostuff/sets"
+)
 
 const (
 	// Punish containment for possible mismatches.
@@ -13,26 +16,9 @@ const (
 	ghostUnion = 0
 )
 
-// Counts the common elements in a and b, assuming they are both sorted.
-func common(a, b []uint64) int {
-	c, i, j := 0, 0, 0
-	for i < len(a) && j < len(b) {
-		if a[i] < b[j] {
-			i++
-		} else if b[j] < a[i] {
-			j++
-		} else {
-			c++
-			i++
-			j++
-		}
-	}
-	return c
-}
-
 // Jaccard returns the Jaccard similarity between a and b.
 func Jaccard(a, b []uint64) float64 {
-	i := common(a, b)
+	i := sets.SortedIntersectionLen(a, b)
 	u := len(a) + len(b) - i
 	u += ghostUnion
 	return float64(i) / float64(u)
@@ -41,7 +27,7 @@ func Jaccard(a, b []uint64) float64 {
 // Containment returns a Jaccard-like similarity for the containment
 // of a in b.
 func Containment(a, b []uint64) float64 {
-	i := common(a, b)
+	i := sets.SortedIntersectionLen(a, b)
 	u := len(a)
 	if compensatingCont {
 		u += len(a) - i
