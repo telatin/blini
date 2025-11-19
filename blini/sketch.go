@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/fluhus/gostuff/aio"
@@ -18,15 +19,22 @@ func mainSketch() error {
 	fmt.Println("----------------")
 	fmt.Println("Scale:", *scale)
 
-	if !strings.HasSuffix(*oFile, indexSuffix) {
-		*oFile += indexSuffix
+	var out io.Writer
+	if *oFile == "" {
+		fmt.Println("No output")
+		out = io.Discard
+	} else {
+		if !strings.HasSuffix(*oFile, indexSuffix) {
+			*oFile += indexSuffix
+		}
+		fmt.Println("Saving to:", *oFile)
+		f, err := aio.Create(*oFile)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		out = f
 	}
-	fmt.Println("Saving to:", *oFile)
-	f, err := aio.Create(*oFile)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
 
 	fmt.Println("Sketching sequences")
 	pt := ptimer.New()
@@ -34,7 +42,7 @@ func mainSketch() error {
 		if err != nil {
 			return err
 		}
-		if err := bnry.Write(f, e.s, e.ln, e.name, e.scale); err != nil {
+		if err := bnry.Write(out, e.s, e.ln, e.name, e.scale); err != nil {
 			return err
 		}
 		pt.Inc()
