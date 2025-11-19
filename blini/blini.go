@@ -31,7 +31,7 @@ var (
 	oFile  = flag.String("o", "", "Output file or prefix")
 	contn  = flag.Bool("c", false, "Use containment rather than full match")
 	minSim = flag.Float64("m", 0.9, "Minimum similarity for match")
-	scale  = flag.Uint64("s", 200, "Use 1/`scale` of the kmers")
+	scale  = flag.Uint64("s", 100, "Use 1/`scale` of the kmers")
 )
 
 func main() {
