@@ -68,9 +68,11 @@ func mainCluster() error {
 			if sk.skch[f] == nil {
 				continue
 			}
-			sim := 1 - mash.FromJaccard(jaccard(sk.skch[f], s), kmerLen)
+			var sim float64
 			if useMyDist {
 				sim = 1 - myDist(sk.skch[f], s, sk.lens[f], sk.lens[i])
+			} else {
+				sim = 1 - mash.FromJaccard(jaccard(sk.skch[f], s), kmerLen)
 			}
 			if sim < *minSim {
 				continue

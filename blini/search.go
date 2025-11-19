@@ -71,9 +71,11 @@ func mainSearch() error {
 		}
 		s := sketching.Sketch(fa.Sequence, kmerLen, sk.scale)
 		for _, f := range idx.Search(s) {
-			sim := 1 - mash.FromJaccard(jaccard(s, sk.skch[f]), kmerLen)
+			var sim float64
 			if useMyDist {
 				sim = 1 - myDist(s, sk.skch[f], len(fa.Sequence), sk.lens[f])
+			} else {
+				sim = 1 - mash.FromJaccard(jaccard(s, sk.skch[f]), kmerLen)
 			}
 			if sim >= *minSim {
 				matches++
