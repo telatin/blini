@@ -32,6 +32,8 @@ var (
 	contn  = flag.Bool("c", false, "Use containment rather than full match")
 	minSim = flag.Float64("m", 0.9, "Minimum similarity for match")
 	scale  = flag.Uint64("s", 100, "Use 1/`scale` of the kmers")
+
+	version = "development version"
 )
 
 func main() {
@@ -46,6 +48,7 @@ func main() {
 	} else if *rFile != "" {
 		err = mainSketch()
 	} else {
+		fmt.Printf("Blini (%s)\n\n", version)
 		fmt.Println("Please select -q for clustering, -r for sketching,",
 			"or both for searching.")
 		flag.PrintDefaults()
