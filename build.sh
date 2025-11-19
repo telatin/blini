@@ -1,19 +1,28 @@
 # Compiles blini executables for all platforms.
+
 set -e
 
-rm -fr build
-mkdir build
+EXE=blini
+VERSION=v0.3.1
+OUTDIR=../release
+FLAGS="-ldflags=-s -X main.version=$VERSION"
+
+rm -fr $OUTDIR
+mkdir $OUTDIR
 
 # Linux
-go build -o build ./blini
-zip -j build/blini_linux_amd64.zip build/blini
+go build "$FLAGS" -o $OUTDIR ./$EXE
+zip -j $OUTDIR/${EXE}_linux.zip $OUTDIR/$EXE
+rm $OUTDIR/$EXE
 
 # Mac
-GOOS=darwin GOARCH=arm64 go build -o build ./blini
-zip -j build/blini_mac_arm64.zip build/blini
+GOOS=darwin go build "$FLAGS" -o $OUTDIR ./$EXE
+zip -j $OUTDIR/${EXE}_mac.zip $OUTDIR/$EXE
+rm $OUTDIR/$EXE
 
 # Windows
-GOOS=windows go build -o build ./blini
-zip -j build/blini_win_amd64.zip build/blini.exe
+GOOS=windows go build "$FLAGS" -o $OUTDIR ./$EXE
+zip -j $OUTDIR/${EXE}_win.zip $OUTDIR/$EXE.exe
+rm $OUTDIR/$EXE.exe
 
-rm build/blini build/blini.exe
+ls -lh $OUTDIR
