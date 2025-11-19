@@ -1,5 +1,7 @@
 package sketching
 
+import "iter"
+
 // Replaces a map with slice values.
 type svmap[K comparable, V any] struct {
 	singles map[K]V
@@ -23,12 +25,20 @@ func (s svmap[K, V]) put(k K, v V) {
 	}
 }
 
-// Returns the slice associated in k.
-func (s svmap[K, V]) get(k K) []V {
-	if v, ok := s.singles[k]; ok {
-		return append([]V{v}, s.slices[k]...)
+// Yields the elements associated with k.
+func (s svmap[K, V]) get(k K) iter.Seq[V] {
+	return func(yield func(V) bool) {
+		if v, ok := s.singles[k]; ok {
+			if !yield(v) {
+				return
+			}
+			for _, v := range s.slices[k] {
+				if !yield(v) {
+					return
+				}
+			}
+		}
 	}
-	return nil
 }
 
 // Removes keys with one value.

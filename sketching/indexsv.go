@@ -42,7 +42,9 @@ func (idx *Index) Search(s []uint64) []int {
 		if x > idx.mx {
 			break
 		}
-		set.Add(idx.idx.get(x)...)
+		for i := range idx.idx.get(x) {
+			set.Add(i)
+		}
 	}
 	return maps.Keys(set)
 }

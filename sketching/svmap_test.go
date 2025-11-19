@@ -24,13 +24,13 @@ func TestSVMap(t *testing.T) {
 		{7, nil, nil},
 	}
 	for _, test := range tests {
-		if got := s.get(test.k); !slices.Equal(got, test.want) {
+		if got := slices.Collect(s.get(test.k)); !slices.Equal(got, test.want) {
 			t.Errorf("get(%d)=%d, want %d", test.k, got, test.want)
 		}
 	}
 	s.clearSingles()
 	for _, test := range tests {
-		if got := s.get(test.k); !slices.Equal(got, test.wantClear) {
+		if got := slices.Collect(s.get(test.k)); !slices.Equal(got, test.wantClear) {
 			t.Errorf("get(%d)=%d, want %d", test.k, got, test.wantClear)
 		}
 	}
