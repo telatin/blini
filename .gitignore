@@ -10,5 +10,7 @@ x/
 # Temporary outputs
 tmp*
 
-# Generated test data
-publication/testdata/
+# Publication temporary intermediates
+testdata/
+publication/**/*.pdf
+

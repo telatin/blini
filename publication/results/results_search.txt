@@ -1,0 +1,7 @@
+name,time_seconds_1,time_seconds_2,time_seconds_3,time_seconds_4,time_seconds_5,source_found,others_found
+Blini,0.5,0.5,0.5,0.5,0.5,100,824
+Blini (SNPs),0.5,0.5,0.5,0.5,0.5,100,712
+Sourmash,126,124,127,126,126,100,865
+Sourmash (SNPs),127,127,126,127,128,100,660
+MMseqs,152,153,152,155,152,100,3143
+MMseqs (SNPs),151,152,149,149,147,100,3019

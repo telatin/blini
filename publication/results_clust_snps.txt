@@ -1,7 +1,0 @@
-name,time_seconds,max_mem_mb,ari
-blini-25-scale,10.9,148,1
-blini-50-scale,9.7,78,1
-blini-100-scale,8.7,30,1
-blini-200-scale,9.2,20,0.998
-mmseqs-1-threads,166,977,1
-mmseqs-4-threads,54,1024,1

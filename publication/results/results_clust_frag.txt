@@ -1,0 +1,7 @@
+name,time_seconds_1,time_seconds_2,time_seconds_3,time_seconds_4,time_seconds_5,max_mem_mb,n_clusters,ari
+Blini (scale 25),22,22,22,22,22,462,100,0.999
+Blini (scale 50),20,20,20,20,20,233,104,0.999
+Blini (scale 100),19,19,19,19,19,119,135,0.998
+Blini (scale 200),19,19,19,19,19,67,386,0.989
+MMseqs (1 thread),81,80,80,80,80,5530,101,1
+MMseqs (4 threads),24,24,24,24,24,5632,101,1

@@ -4,8 +4,11 @@ package main
 import (
 	"fmt"
 	"path/filepath"
+	"regexp"
 
-	"github.com/fluhus/gostuff/csvdec"
+	"github.com/fluhus/gostuff/csvx"
+	"github.com/fluhus/gostuff/sets"
+	"golang.org/x/exp/maps"
 )
 
 func main() {
@@ -13,24 +16,42 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Print("Blini: ")
 	fmt.Println(findMatches(e))
 
 	e, err = readBlini("tmp.blini_mut.csv")
 	if err != nil {
 		panic(err)
 	}
+	fmt.Print("Blini (mut): ")
 	fmt.Println(findMatches(e))
 
 	e, err = readSourmash("tmp.sm_vir_*.csv")
 	if err != nil {
 		panic(err)
 	}
+	fmt.Print("Sourmash: ")
 	fmt.Println(findMatches(e))
 
 	e, err = readSourmash("tmp.sm_mut_*.csv")
 	if err != nil {
 		panic(err)
 	}
+	fmt.Print("Sourmash (mut): ")
+	fmt.Println(findMatches(e))
+
+	e, err = readMMSeqs("tmp.mms")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Print("MMseqs: ")
+	fmt.Println(findMatches(e))
+
+	e, err = readMMSeqs("tmp.mmsm")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Print("MMseqs (mut): ")
 	fmt.Println(findMatches(e))
 }
 
@@ -40,11 +61,14 @@ func readBlini(file string) ([][2]string, error) {
 		Query, Reference string
 	}
 	var result [][2]string
-	for e, err := range csvdec.FileHeader[entry](file, nil) {
+	for e, err := range csvx.DecodeFileHeader[entry](file) {
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, [2]string{e.Query, e.Reference})
+		result = append(result, [2]string{
+			e.Query,
+			firstWord(e.Reference)},
+		)
 	}
 	return result, nil
 }
@@ -61,14 +85,32 @@ func readSourmash(glob string) ([][2]string, error) {
 		return nil, err
 	}
 	for _, file := range files {
-		for e, err := range csvdec.FileHeader[entry](file, nil) {
+		for e, err := range csvx.DecodeFileHeader[entry](file) {
 			if err != nil {
 				return nil, err
 			}
-			result = append(result, [2]string{e.Query, e.Reference})
+			result = append(result, [2]string{
+				e.Query,
+				firstWord(e.Reference)},
+			)
 		}
 	}
 	return result, nil
+}
+
+func readMMSeqs(file string) ([][2]string, error) {
+	type entry struct {
+		Query     string
+		Reference string
+	}
+	result := sets.Set[[2]string]{}
+	for e, err := range csvx.DecodeFile[entry](file, csvx.TSV) {
+		if err != nil {
+			return nil, err
+		}
+		result.Add([2]string{e.Query, e.Reference})
+	}
+	return maps.Keys(result), nil
 }
 
 // Returns the number of matches (query=reference)
@@ -83,4 +125,11 @@ func findMatches(entries [][2]string) (int, int) {
 		}
 	}
 	return matches, mismatches
+}
+
+var splitter = regexp.MustCompile(`^\S+`)
+
+// Returns the first non-space substring.
+func firstWord(s string) string {
+	return splitter.FindString(s)
 }
