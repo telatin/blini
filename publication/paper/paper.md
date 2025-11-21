@@ -72,14 +72,10 @@ in the database.
 In a second run, random SNPs were introduced to 1% of the genomes'
 bases, and the same test was rerun.
 For each test, the number of matches with sequences other than
-the query's source was also recorded.
+the query's source was also measured.
+The times shown here do not include reference-preprocessing time.
 
-| Test | Time (s) | Successful matches | Non-source matches |
-|------|----------|--------------------|--------------------|
-| Blini | 0.4 | 98 | 254 |
-| Blini (SNPs) | 0.4 | 98 | 207 |
-| Sourmash | 681 | 97 | 244 |
-| Sourmash (SNPs) | 680 | 94 | 139 |
+![Search results for the viral dataset.](../results/search.png)
 
 ## Clustering
 

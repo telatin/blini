@@ -83,14 +83,14 @@ go run ./publication/testclust
 
 # Search
 python $cmbfigdir/cmbfig.py \
-  -c 3 -o search.png -i \
+  -c 3 -o results/search.png -i \
   $plotdir/search_found.png \
   $plotdir/search_others.png \
   $plotdir/search_time.png
 
 # Cluster frag
 python $cmbfigdir/cmbfig.py \
-  -c 2 -o clust_frag.png -i \
+  -c 2 -o results/clust_frag.png -i \
   $plotdir/clust_frag_nclust.png \
   $plotdir/clust_frag_ari.png \
   $plotdir/clust_frag_time.png \
@@ -98,7 +98,7 @@ python $cmbfigdir/cmbfig.py \
 
 # Cluster snps
 python $cmbfigdir/cmbfig.py \
-  -c 2 -o clust_snps.png -i \
+  -c 2 -o results/clust_snps.png -i \
   $plotdir/clust_snps_nclust.png \
   $plotdir/clust_snps_ari.png \
   $plotdir/clust_snps_time.png \

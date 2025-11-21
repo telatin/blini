@@ -5,6 +5,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from myplot import ctx
 
+OUT_DIR = '../testdata/output'
+
 
 def load_table(f: str):
     d = defaultdict(list)
@@ -22,23 +24,23 @@ def load_table(f: str):
 
 
 def plot_search():
-    d = load_table('results_search.txt')
+    d = load_table('results/results_search.txt')
     print(d)
     d['name'] = [x.replace(' ', '\n') for x in d['name']]
-    with ctx('search_time', sizeratio=0.75):
+    with ctx(f'{OUT_DIR}/search_time', sizeratio=0.75):
         plt.bar(d['name'][:2], d['time_seconds'][:2])
         plt.bar(d['name'][2:4], d['time_seconds'][2:4])
         plt.bar(d['name'][4:], d['time_seconds'][4:])
         plt.yscale('log')
         plt.ylabel('Average time (s)')
         plt.xticks(rotation=20)
-    with ctx('search_found', sizeratio=0.75):
+    with ctx(f'{OUT_DIR}/search_found', sizeratio=0.75):
         plt.bar(d['name'][:2], d['source_found'][:2])
         plt.bar(d['name'][2:4], d['source_found'][2:4])
         plt.bar(d['name'][4:], d['source_found'][4:])
         plt.ylabel('Successful matches (out of 100)')
         plt.xticks(rotation=20)
-    with ctx('search_others', sizeratio=0.75):
+    with ctx(f'{OUT_DIR}/search_others', sizeratio=0.75):
         plt.bar(d['name'][:2], d['others_found'][:2])
         plt.bar(d['name'][2:4], d['others_found'][2:4])
         plt.bar(d['name'][4:], d['others_found'][4:])
@@ -48,7 +50,6 @@ def plot_search():
 
 def plot_clust(tag: str):
     d = load_table(f'results_clust_{tag}.txt')
-    # d['name'] = [x.replace(' (', '\n(') for x in d['name']]
     print(d)
     with ctx(f'clust_{tag}_time', sizeratio=0.75):
         plt.bar(d['name'][:4], d['time_seconds'][:4])
@@ -70,7 +71,7 @@ def plot_clust(tag: str):
         ylim[0] -= stretch
         ylim[1] += stretch
         plt.ylim(ylim)
-    with ctx(f'clust_{tag}_nclust', sizeratio=0.75):
+    with ctx(f'{OUT_DIR}/clust_{tag}_nclust', sizeratio=0.75):
         plt.bar(d['name'][:4], d['n_clusters'][:4])
         plt.bar(d['name'][4:], d['n_clusters'][4:])
         plt.ylabel('Number of clusters')
@@ -79,5 +80,5 @@ def plot_clust(tag: str):
 
 plt.style.use('ggplot')
 plot_search()
-# plot_clust('frag')
-# plot_clust('snps')
+plot_clust('frag')
+plot_clust('snps')

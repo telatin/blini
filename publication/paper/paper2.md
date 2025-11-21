@@ -25,7 +25,7 @@ abstract: |
   It is meant to help cleaning and characterizing large collections
   of sequences that would otherwise be too big to search with online tools,
   or too demanding for a local machine to process.
-  Benchmarks on real and simulated data
+  Benchmarks on simulated data
   demonstrate that it is faster than existing tools
   and requires less RAM,
   while preserving search and clustering accuracy.
@@ -138,6 +138,8 @@ In a second run, random SNPs were introduced to 1% of the genomes'
 bases, and the same test was rerun.
 For each test, the number of matches with sequences other than
 the query's source was also measured.
+The searches were run against an index of the reference dataset,
+created by each tool.
 
 All three tools were able to match all 100 queries with their sources
 in the database (Figure 1a).
@@ -152,17 +154,23 @@ Each run was repeated five times and the average run-time is reported.
 Blini completed the run in 0.5 seconds,
 Sourmash completed the run in 126 seconds,
 and MMseqs completed the run in 151 seconds (Figure 1c).
+The times shown here do not include reference-preprocessing time.
 
 ![Search results for the viral dataset.](../results/search.png)
 
 ### Clustering
 
 The clustering function was tested on two simulated datasets
-of randomly generated sequences, of lengths ranging between 10K to 1M bases.
-In one dataset each sequence had two counterparts with random SNPs.
+created from the 100 chosen genomes of the previous test.
+In one dataset each sequence had multiple counterparts with random SNPs.
 In the second dataset random fragments were extracted from
 each root sequence.
-Fragment lengths ranged from 1000 to 500K base pairs.
+In the SNPs dataset, each of the 100 original sequences had another 100
+mutated counterparts.
+Each counterpart had random SNPs in 1% of its bases.
+In the fragments dataset, each of the 100 original sequences
+had 300 random fragments extracted from it,
+of length of at least 1000 bases.
 The algorithms were expected to group each sequence with its mutated
 counterparts or with its fragments.
 Performance was evaluated using the Adjusted Rand Index (ARI).
@@ -170,25 +178,30 @@ Blini's *scale* refers to the fraction of k-mers considered
 for the operation.
 Scale 50 means that 1/50 of k-mers were used.
 
-In the SNPs dataset, both Blini and MMseqs achieved an ARI of 1.0,
-except for Blini with scale 200 which achieved an ARI of 0.998 (Figure 2a).
-Blini took on average 9.6 seconds, and MMseqs took 166 seconds with one
-thread, and 54 seconds with four threads (Figure 2b).
-In terms of memory, Blini had a maximal memory footprint of 148, 78, 30, and
-20 MB using scales 25, 50, 100 and 200 respectively.
-MMseq had a maximal memory footprint of 1000 MB on average (Figure 2c).
+In the SNPs dataset, both Blini and MMseqs achieved an ARI between 0.999 and 1.0,
+except for Blini with scale 200 which achieved an ARI of 0.997 (Figure 2b).
+Blini created 100, 100, 101 and 110 clusters using scales
+25, 50, 100 and 200 respectively.
+MMseqs created 103 clusters (Figure 2a).
+Blini took on average 10.5 seconds,
+and MMseqs took 46 seconds with one thread,
+and 14 seconds with four threads (Figure 2b).
+In terms of memory, Blini had a maximal memory footprint of 255, 129, 65, and
+38 MB using scales 25, 50, 100 and 200 respectively.
+MMseq had a maximal memory footprint of 3072 MB (Figure 2c).
 
 ![Clustering results for the SNPs dataset.](../results/clust_snps.png){width=75%}
 
 In the fragments dataset, MMseqs achieved an ARI of 1.0 while Blini
-achieved an ARI of 1.0, 0.999, 0.993 and 0.972 with scales 25, 50, 100 and 200
-(Figure 3a).
-Blini took on average 6.2 seconds, and MMseqs took 130 seconds with one
-thread, and 43 seconds with four threads (Figure 3b).
-In terms of memory, Blini had a maximal memory footprint of 58, 33, 31, and
-14 MB using scales 25, 50, 100 and 200 respectively.
-MMseq had a maximal memory footprint of 181 and 727 MB with one and four
-threads respectively (Figure 3c).
+achieved an ARI of 0.999, 0.999, 0.998 and 0.989 with scales 25, 50, 100 and 200
+(Figure 3b).
+Blini grouped the dataset into 100, 104, 135 and 386 clusters,
+while MMseqs grouped the dataset into 101 clusters (Figure 3a).
+Blini took on average 20 seconds, and MMseqs took 80 seconds with one
+thread, and 24 seconds with four threads (Figure 3c).
+In terms of memory, Blini had a maximal memory footprint of 462, 233, 119, and
+67 MB using scales 25, 50, 100 and 200 respectively.
+MMseq had a maximal memory footprint of 5632 (Figure 3d).
 
 ![Clustering results for the fragments dataset.](../results/clust_frag.png){width=75%}
 
@@ -197,38 +210,39 @@ threads respectively (Figure 3c).
 This work introduces a new technique for nucleotide sequence search and
 dereplication.
 The algorithm incorporates insights from several developments in the field,
-specifically around the use of k-mers for sequence search and ANI approximation,
+specifically around the use of k-mers for sequence search and
+average nucleotide identity (ANI) approximation,
 combined with a minimalist implementation,
 resulting in a scalable and easy to use utility.
 
-The performance benchmarks shown here demonstrate a 1700x speedup
-for search and a 15x speedup for clustering
+The performance benchmarks shown here demonstrate a 300x speedup
+for search and a 4x speedup for clustering
 in comparison to existing implementations,
 as well as a reduced memory footprint,
 while search and clustering accuracy was maintained.
 
 One drawback is that Blini does not perform alignment,
 and instead uses an approximation for ANI.
-This can be observed in Figure 3a, where clustering accuracy
+This can be observed in Figure 3a-b, where clustering accuracy
 decreased as the *scale* parameter increased beyond the recommended
 value for that dataset (see below).
 This approach trades some accuracy for scalability.
 
 The *scale* parameter controls the ratio of k-mers used in the procedure,
-and can be tweaked. 
+and it can be tweaked. 
 While higher scale values reduce CPU and RAM consumption,
 they also affect the minimal length of sequences the algorithm would be
 effective for.
 Blini is designed to work on sequences ~20 times longer than
 the selected *scale* value.
-For the default value of 200,
-sequences shorter than 4000 are likely to be accidentally missed.
-This can be seen in Figure 3a, where a decrease in clustering
+For the default scale of 100,
+sequences shorter than 2000 are likely to be falsely missed.
+This can be seen in Figure 3a-b, where a decrease in clustering
 accuracy was observed for scale >50 with fragments of size 1000.
 While the scale can be tweaked,
 this tool might not be suitable for short reads.
 
-In summary, this is a new tool for search and dereplication of large-scale
+In summary, this is a new algorithm for search and dereplication of large-scale
 sequence collections.
 It is meant to run locally on resource-limited systems while
 maintaining performance and accuracy.
