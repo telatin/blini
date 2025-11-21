@@ -156,7 +156,7 @@ Sourmash completed the run in 126 seconds,
 and MMseqs completed the run in 151 seconds (Figure 1c).
 The times shown here do not include reference-preprocessing time.
 
-![Search results for the viral dataset.](../results/search.png)
+![Search results for the viral dataset.](results/search.png)
 
 ### Clustering
 
@@ -190,7 +190,7 @@ In terms of memory, Blini had a maximal memory footprint of 255, 129, 65, and
 38 MB using scales 25, 50, 100 and 200 respectively.
 MMseq had a maximal memory footprint of 3072 MB (Figure 2c).
 
-![Clustering results for the SNPs dataset.](../results/clust_snps.png){width=75%}
+![Clustering results for the SNPs dataset.](results/clust_snps.png){width=75%}
 
 In the fragments dataset, MMseqs achieved an ARI of 1.0 while Blini
 achieved an ARI of 0.999, 0.999, 0.998 and 0.989 with scales 25, 50, 100 and 200
@@ -203,7 +203,7 @@ In terms of memory, Blini had a maximal memory footprint of 462, 233, 119, and
 67 MB using scales 25, 50, 100 and 200 respectively.
 MMseq had a maximal memory footprint of 5632 (Figure 3d).
 
-![Clustering results for the fragments dataset.](../results/clust_frag.png){width=75%}
+![Clustering results for the fragments dataset.](results/clust_frag.png){width=75%}
 
 # Discussion
 

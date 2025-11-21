@@ -75,7 +75,7 @@ For each test, the number of matches with sequences other than
 the query's source was also measured.
 The times shown here do not include reference-preprocessing time.
 
-![Search results for the viral dataset.](../results/search.png)
+![Search results for the viral dataset.](results/search.png)
 
 ## Clustering
 
@@ -98,9 +98,9 @@ Blini's *scale* refers to the fraction of k-mers considered
 for the operation.
 Scale 50 means that 1/50 of k-mers were used.
 
-![Clustering results for the SNPs dataset.](../results/clust_snps.png){width=75%}
+![Clustering results for the SNPs dataset.](results/clust_snps.png){width=75%}
 
-![Clustering results for the fragments dataset.](../results/clust_frag.png){width=75%}
+![Clustering results for the fragments dataset.](results/clust_frag.png){width=75%}
 
 # Limitations
 
