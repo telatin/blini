@@ -79,46 +79,35 @@ The times shown here do not include reference-preprocessing time.
 
 ## Clustering
 
-The clustering function was tested on two simulated datasets.
-In one dataset each sequence had two counterparts with random SNPs.
+The clustering function was tested on two simulated datasets
+created from the 100 chosen genomes of the previous test.
+In one dataset each sequence had multiple counterparts with random SNPs.
 In the second dataset random fragments were extracted from
 each root sequence.
+In the SNPs dataset, each of the 100 original sequences had another 100
+mutated counterparts.
+Each counterpart had random SNPs in 1% of its bases.
+In the fragments dataset, each of the 100 original sequences
+had 300 random fragments extracted from it,
+of length of at least 1000 bases.
+
 The algorithms were expected to group each sequence with its mutated
 counterparts or with its fragments.
 Performance was evaluated using the Adjusted Rand Index (ARI).
-
 Blini's *scale* refers to the fraction of k-mers considered
 for the operation.
 Scale 50 means that 1/50 of k-mers were used.
 
-**SNPs dataset**
+![Clustering results for the SNPs dataset.](../results/clust_snps.png){width=75%}
 
-| Test | Time (s) | Max memory (MB) | ARI |
-|------|----------|-----------------|-----|
-| MMseqs (1 thread) | 166 | 977 | 1 |
-| MMseqs (4 threads) | 54 | 1024 | 1 |
-| Blini (scale 25) | 10.9 | 148 | 1 |
-| Blini (scale 50) | 9.7 | 78 | 1 |
-| Blini (scale 100) | 8.7 | 30 | 1 |
-| Blini (scale 200) | 9.2 | 20 | 0.998 |
-
-**Fragments dataset**
-
-| Test | Time (s) | Max memory (MB) | ARI |
-|------|----------|-----------------|-----|
-| MMseqs (1 thread) | 130 | 181 | 1 |
-| MMseqs (4 threads) | 43 | 727 | 1 |
-| Blini (scale 25) | 6.7 | 58 | 1 |
-| Blini (scale 50) | 6.1 | 33 | 0.999 |
-| Blini (scale 100) | 5.9 | 31 | 0.993 |
-| Blini (scale 200) | 5.8 | 14 | 0.972 |
+![Clustering results for the fragments dataset.](../results/clust_frag.png){width=75%}
 
 # Limitations
 
-Blini is designed to work on sequences ~10 times longer than
+Blini is designed to work on sequences ~20 times longer than
 the selected *scale* value.
-For the default value of 200,
-sequences shorter than 2000 are likely to be accidentally missed.
+For the default value of 100,
+sequences shorter than 2000 are likely to be falsely missed.
 While the scale can be tweaked,
 this tool might not be suitable for short reads.
 
