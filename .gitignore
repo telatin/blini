@@ -12,5 +12,5 @@ tmp*
 
 # Publication temporary intermediates
 testdata/
-publication/**/*.pdf
+paper/**/*.pdf
 

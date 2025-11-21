@@ -8,7 +8,7 @@ cmbfigdir=
 ## DATA GENERATION
 
 # Generate simulated dataset.
-go run ./publication/refseqpick $datadir/viral.1.1.genomic.fna.gz
+go run ./paper/gentestdata $datadir/viral.1.1.genomic.fna.gz
 
 
 # PRE-SKETCH REFERENCE DATASET
@@ -47,7 +47,7 @@ time mmseqs easy-search --search-type 3 --threads 1 --min-seq-id 0.9 testdata/fa
 time mmseqs easy-search --search-type 3 --threads 1 --min-seq-id 0.9 testdata/fasta/mut_all.fa $outdir/viral.mm tmp.mmsm tmp
 
 # Evaluate searches.
-go run ./publication/testsearch
+go run ./paper/testsearch
 
 
 ## CLUSTERING
@@ -76,7 +76,7 @@ for t in 1 4; do
 done
 
 # Evaluate clustering.
-go run ./publication/testclust
+go run ./paper/testclust
 
 
 ## PLOT COMBINING

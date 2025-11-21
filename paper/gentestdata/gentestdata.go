@@ -9,7 +9,7 @@ import (
 	"slices"
 
 	"github.com/fluhus/biostuff/formats/fasta"
-	"github.com/fluhus/blini/publication/simul"
+	"github.com/fluhus/blini/paper/simul"
 	"github.com/fluhus/gostuff/aio"
 	"github.com/fluhus/gostuff/gnum"
 	"github.com/fluhus/gostuff/reservoir"
