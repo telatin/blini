@@ -14,9 +14,13 @@ import (
 	"golang.org/x/exp/maps"
 )
 
+const (
+	outDir = "testdata/output"
+)
+
 func main() {
 	fmt.Println("Testing mmseqs clusters")
-	groups, err := readMMSClusters("tmp.mm_cluster.tsv")
+	groups, err := readMMSClusters(outDir + "/mm_cluster.tsv")
 	if err != nil {
 		panic(err)
 	}
@@ -27,7 +31,7 @@ func main() {
 	fmt.Println("ARI:", clustering.AdjustedRandIndex(gotTags, wantTags))
 
 	fmt.Println("Testing blini clusters")
-	bliniFiles, _ := filepath.Glob("tmp.blini_*.json")
+	bliniFiles, _ := filepath.Glob(outDir + "/blini_*.json")
 	for _, f := range bliniFiles {
 		bln := struct {
 			ByName [][]string

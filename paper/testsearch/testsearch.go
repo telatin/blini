@@ -11,43 +11,47 @@ import (
 	"golang.org/x/exp/maps"
 )
 
+const (
+	outDir = "testdata/output"
+)
+
 func main() {
-	e, err := readBlini("tmp.blini_vir.csv")
+	e, err := readBlini(outDir + "/blini_vir.csv")
 	if err != nil {
 		panic(err)
 	}
 	fmt.Print("Blini: ")
 	fmt.Println(findMatches(e))
 
-	e, err = readBlini("tmp.blini_mut.csv")
+	e, err = readBlini(outDir + "/blini_mut.csv")
 	if err != nil {
 		panic(err)
 	}
 	fmt.Print("Blini (mut): ")
 	fmt.Println(findMatches(e))
 
-	e, err = readSourmash("tmp.sm_vir_*.csv")
+	e, err = readSourmash(outDir + "/sm_vir_*.csv")
 	if err != nil {
 		panic(err)
 	}
 	fmt.Print("Sourmash: ")
 	fmt.Println(findMatches(e))
 
-	e, err = readSourmash("tmp.sm_mut_*.csv")
+	e, err = readSourmash(outDir + "/sm_mut_*.csv")
 	if err != nil {
 		panic(err)
 	}
 	fmt.Print("Sourmash (mut): ")
 	fmt.Println(findMatches(e))
 
-	e, err = readMMSeqs("tmp.mms")
+	e, err = readMMSeqs(outDir + "/mms")
 	if err != nil {
 		panic(err)
 	}
 	fmt.Print("MMseqs: ")
 	fmt.Println(findMatches(e))
 
-	e, err = readMMSeqs("tmp.mmsm")
+	e, err = readMMSeqs(outDir + "/mmsm")
 	if err != nil {
 		panic(err)
 	}
