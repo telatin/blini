@@ -13,7 +13,7 @@ const (
 
 	// Add a ghost count to the union part of Jaccard calculations.
 	// This "punishes" low kmer counts and makes them look less similar.
-	ghostUnion = 1
+	ghostUnion = 0
 )
 
 // Jaccard returns the Jaccard similarity between a and b.
