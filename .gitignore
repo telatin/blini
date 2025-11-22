@@ -1,16 +1,9 @@
 # VSCode workspace dir
 .vscode/
 
-# Build outputs
-build/
-
 # Experimental stuff
 x/
-
-# Temporary outputs
-tmp*
 
 # Publication temporary intermediates
 testdata/
 paper/**/*.pdf
-
