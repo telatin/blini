@@ -1,7 +1,6 @@
 # Runs benchmarks on blini, sourmash and mmseqs.
 
 datadir=
-plotdir=
 cmbfigdir=
 
 outdir=testdata/output
@@ -86,23 +85,23 @@ go run ./paper/testclust
 
 # Search
 python $cmbfigdir/cmbfig.py \
-  -c 3 -o results/search.png -i \
-  $plotdir/search_found.png \
-  $plotdir/search_others.png \
-  $plotdir/search_time.png
+  -c 3 -o paper/results/search.png -i \
+  $outdir/search_found.png \
+  $outdir/search_others.png \
+  $outdir/search_time.png
 
 # Cluster frag
 python $cmbfigdir/cmbfig.py \
-  -c 2 -o results/clust_frag.png -i \
-  $plotdir/clust_frag_nclust.png \
-  $plotdir/clust_frag_ari.png \
-  $plotdir/clust_frag_time.png \
-  $plotdir/clust_frag_mem.png
+  -c 2 -o paper/results/clust_frag.png -i \
+  $outdir/clust_frag_nclust.png \
+  $outdir/clust_frag_ari.png \
+  $outdir/clust_frag_time.png \
+  $outdir/clust_frag_mem.png
 
 # Cluster snps
 python $cmbfigdir/cmbfig.py \
-  -c 2 -o results/clust_snps.png -i \
-  $plotdir/clust_snps_nclust.png \
-  $plotdir/clust_snps_ari.png \
-  $plotdir/clust_snps_time.png \
-  $plotdir/clust_snps_mem.png
+  -c 2 -o paper/results/clust_snps.png -i \
+  $outdir/clust_snps_nclust.png \
+  $outdir/clust_snps_ari.png \
+  $outdir/clust_snps_time.png \
+  $outdir/clust_snps_mem.png

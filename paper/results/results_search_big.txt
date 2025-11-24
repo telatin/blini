@@ -1,0 +1,7 @@
+name,time_seconds
+Blini (1 seq),6
+Blini (10 seqs),6
+Blini (100K seqs),25
+Sourmash (1 seq),31
+Sourmash (10 seqs),310
+MMseqs (1 seq),1800
