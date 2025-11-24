@@ -96,7 +96,7 @@ The first step of searching is indexing the reference dataset.
 After the reference sequences are fingerprinted,
 the 25% lowest hashes are used for indexing.
 The index is a mapping from hash value to a list
-of serial numbers of the reference sequences that had that
+of sequence identifiers of the reference sequences that had that
 hash in their fingerprints.
 The number 25% was chosen as a sweet spot between
 saving memory and retaining enough information for the search.
@@ -205,7 +205,7 @@ had 300 random fragments extracted from it,
 of length of at least 1000 bases.
 The algorithms were expected to group each sequence with its mutated
 counterparts or with its fragments.
-Performance was evaluated using the Adjusted Rand Index (ARI).
+Performance was evaluated using the Adjusted Rand-Index (ARI).
 Blini's *scale* refers to the fraction of k-mers considered
 for the operation.
 Scale 50 means that 1/50 of k-mers were used.
