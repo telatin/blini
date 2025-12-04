@@ -5,5 +5,5 @@
 x/
 
 # Publication temporary intermediates
-testdata/
 paper/**/*.pdf
+tmp/
