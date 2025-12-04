@@ -23,6 +23,7 @@ func main() {
 	}
 }
 
+// Generates dummy data for testing the clustering function.
 func genClustData() error {
 	const (
 		nClusters = 3
@@ -67,6 +68,7 @@ func genClustData() error {
 	return nil
 }
 
+// Generates dummy data for testing the search function.
 func genSearchData() error {
 	const (
 		nRefs    = 3
@@ -85,16 +87,27 @@ func genSearchData() error {
 		}
 		refs = append(refs, fa)
 
-		// Create elements.
+		// Create queries.
 		for j := range nQueries {
-			ssLen := len(fa.Sequence)/2 + rand.IntN(len(fa.Sequence)/2) - 1
-			ss := &fasta.Fasta{
+			qLen := len(fa.Sequence)/2 + rand.IntN(len(fa.Sequence)/2) - 1
+			q := &fasta.Fasta{
 				Name:     fmt.Appendf(nil, "query%d.%d", i+1, j+1),
-				Sequence: simul.RandSubseq(fa.Sequence, ssLen),
+				Sequence: simul.RandSubseq(fa.Sequence, qLen),
 			}
-			ss.Sequence = simul.MutSeqPerc(ss.Sequence, 2)
-			queries = append(queries, ss)
+			q.Sequence = simul.MutSeqPerc(q.Sequence, 2)
+			queries = append(queries, q)
 		}
+	}
+
+	// Add some queries that match nothing.
+	for i := range nQueries {
+		// Half the length of a ref sequence.
+		ssLen := (minLen + rand.IntN(maxLen-minLen+1)) / 2
+		q := &fasta.Fasta{
+			Name:     fmt.Appendf(nil, "query%d.%d", nRefs+1, i+1),
+			Sequence: simul.RandSeq(ssLen),
+		}
+		queries = append(queries, q)
 	}
 
 	shuffle(refs)
@@ -124,6 +137,7 @@ func genSearchData() error {
 	return nil
 }
 
+// Shuffles a slice.
 func shuffle[T any](a []T) {
 	rand.Shuffle(len(a), func(i, j int) {
 		a[i], a[j] = a[j], a[i]
