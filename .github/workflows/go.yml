@@ -26,3 +26,9 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+
+    - name: Run Test Data
+      run: |
+        go install ./blini
+        sh testdata/run_blini.sh
+        go run ./testdata/test
