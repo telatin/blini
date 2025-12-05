@@ -10,6 +10,7 @@ import (
 	"github.com/fluhus/biostuff/formats/fasta"
 	"github.com/fluhus/gostuff/csvx"
 	"github.com/fluhus/gostuff/jio"
+	"golang.org/x/exp/maps"
 )
 
 const (
@@ -24,7 +25,10 @@ func main() {
 	if err := testClustersSeqs(); err != nil {
 		panic(err)
 	}
-	if err := testSearch(); err != nil {
+	if err := testSearch(false); err != nil {
+		panic(err)
+	}
+	if err := testSearch(true); err != nil {
 		panic(err)
 	}
 	fmt.Println("OK!")
@@ -81,41 +85,67 @@ func testClustersSeqs() error {
 }
 
 // Tests that each query was matched with its reference.
-func testSearch() error {
+func testSearch(unmatched bool) error {
 	const wantSimilarity = 98
 
 	type entry struct {
 		Similarity, Query, Reference string
 	}
 
-	qPattern := regexp.MustCompile(`^query(\d)\.\d$`)
-	rPattern := regexp.MustCompile(`^ref(\d)$`)
+	queryRefMap := map[string]string{
+		"query1.1": "ref1",
+		"query1.2": "ref1",
+		"query1.3": "ref1",
+		"query2.1": "ref2",
+		"query2.2": "ref2",
+		"query2.3": "ref2",
+		"query3.1": "ref3",
+		"query3.2": "ref3",
+		"query3.3": "ref3",
+	}
+	unmatchedPattern := regexp.MustCompile(`^query4\.\d$`)
+
+	wantQueries := maps.Keys(queryRefMap)
+	if unmatched {
+		wantQueries = append(wantQueries, "query4.1", "query4.2", "query4.3")
+	}
+	var gotQueries []string
+
 	similarities := map[string]bool{ // Accepted similarity values.
 		fmt.Sprint(wantSimilarity, "%"):   true,
 		fmt.Sprint(wantSimilarity+1, "%"): true,
 		fmt.Sprint(wantSimilarity-1, "%"): true,
 	}
 
-	for row, err := range csvx.DecodeFileHeader[entry](resultsDir + "/search.csv") {
+	file := resultsDir + "/search.csv"
+	if unmatched {
+		file = resultsDir + "/search_u.csv"
+	}
+	for row, err := range csvx.DecodeFileHeader[entry](file) {
 		if err != nil {
 			return err
 		}
-		q := qPattern.FindStringSubmatch(row.Query)
-		r := rPattern.FindStringSubmatch(row.Reference)
-		if q == nil {
-			return fmt.Errorf("unexpected query name: %q", row.Query)
+		gotQueries = append(gotQueries, row.Query)
+		if unmatched {
+			if unmatchedPattern.MatchString(row.Query) &&
+				row.Reference == "(unmatched)" && row.Similarity == "0%" {
+				continue
+			}
 		}
-		if r == nil {
-			return fmt.Errorf("unexpected reference name: %q", row.Reference)
-		}
-		if q[1] != r[1] {
-			return fmt.Errorf("mismatching query and reference: %q %q",
-				row.Query, row.Reference)
+		if ref, ok := queryRefMap[row.Query]; !ok || row.Reference != ref {
+			return fmt.Errorf("unexpected match: %q %q", row.Query, row.Reference)
 		}
 		if !similarities[row.Similarity] {
 			return fmt.Errorf("unexpected similarity: %s", row.Similarity)
 		}
 	}
+
+	slices.Sort(wantQueries)
+	slices.Sort(gotQueries)
+	if !slices.Equal(gotQueries, wantQueries) {
+		return fmt.Errorf("unexpected queries: %q", gotQueries)
+	}
+
 	return nil
 }
 
