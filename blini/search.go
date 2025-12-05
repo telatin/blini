@@ -70,6 +70,7 @@ func mainSearch() error {
 			return err
 		}
 		s := sketching.Sketch(fa.Sequence, kmerLen, sk.scale)
+		found := false
 		for _, f := range idx.Search(s) {
 			var sim float64
 			if useMyDist {
@@ -85,7 +86,12 @@ func mainSearch() error {
 					sk.names[f],
 				}
 				out.Write(output)
+				found = true
 			}
+		}
+		if !found && *unmatched { // Report unmatched query.
+			output := []string{"0%", string(fa.Name), unmatchedRef}
+			out.Write(output)
 		}
 		pt.Inc()
 	}

@@ -21,17 +21,19 @@ const (
 	kmerLen  = 21
 	idxScale = 4
 
-	useMyDist   = true     // Use a new experiemental distance func.
-	indexSuffix = ".blini" // Suffix of pre-sketched files.
+	useMyDist    = true          // Use a new experiemental distance func.
+	indexSuffix  = ".blini"      // Suffix of pre-sketched files.
+	unmatchedRef = "(unmatched)" // The "reference" value of an unmatched query.
 )
 
 var (
-	qFile  = flag.String("q", "", "Query file")
-	rFile  = flag.String("r", "", "Reference file")
-	oFile  = flag.String("o", "", "Output file or prefix")
-	contn  = flag.Bool("c", false, "Use containment rather than full match")
-	minSim = flag.Float64("m", 0.9, "Minimum similarity for match")
-	scale  = flag.Uint64("s", 100, "Use 1/`scale` of the kmers")
+	qFile     = flag.String("q", "", "Query file")
+	rFile     = flag.String("r", "", "Reference file")
+	oFile     = flag.String("o", "", "Output file or prefix")
+	contn     = flag.Bool("c", false, "Use containment rather than full match")
+	minSim    = flag.Float64("m", 0.9, "Minimum similarity for match")
+	scale     = flag.Uint64("s", 100, "Use 1/`scale` of the kmers")
+	unmatched = flag.Bool("u", false, "Include unmatched queries in search output")
 
 	version = "development version"
 )

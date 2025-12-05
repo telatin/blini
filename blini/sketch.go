@@ -19,6 +19,10 @@ func mainSketch() error {
 	fmt.Println("----------------")
 	fmt.Println("Scale:", *scale)
 
+	if *unmatched {
+		return fmt.Errorf("flag -u is for search, not for sketching")
+	}
+
 	var out io.Writer
 	if *oFile == "" {
 		fmt.Println("No output")

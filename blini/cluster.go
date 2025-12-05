@@ -26,6 +26,10 @@ func mainCluster() error {
 	fmt.Println("Scale:", *scale)
 	fmt.Println("Min sim:", *minSim)
 
+	if *unmatched {
+		return fmt.Errorf("flag -u is for search, not for clustering")
+	}
+
 	fmt.Println("Sketching sequences")
 	sk, err := collectSketches(sketchFile(*qFile))
 	if err != nil {
