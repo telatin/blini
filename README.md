@@ -8,7 +8,7 @@ None.
 [Download](https://github.com/fluhus/blini/releases)
 and get started!
 
-## Usage
+## Usage (basic)
 
 ### Searching
 
@@ -51,6 +51,30 @@ and a JSON file with the cluster assignments.
 * `-m` for searching and clustering,
   minimal similarity for a match.
 * `-s` scale; use 1/s of kmers for similarity.
+* `-u` for search, include unmatched queries in the output.
+
+## Usage (advanced)
+
+### Choosing the scale value (`-s`)
+
+**Scale should be at most 1/25 the length of the sequnces analyzed.**
+
+*Scale* is the k-mer subsampling ratio.
+A scale of 100 means that 1/100 of the k-mers are used for distance calculations.
+Doubling the scale halves RAM and CPU usage, but also loses some accuracy.
+For accurate results, sketches of size 25 and above are needed.
+This means that the scale needs to be up to `sequence length / 25`.
+
+The default scale of 100 is effective for sequences of length 2500 and above.
+For sequences of length 1000, for example, the scale needs to be at most 40.
+
+### Parallelizing reference sketching
+
+Sketch files (`.blini`) can be concatenated
+if they were created using the same scale.
+This is equivalent to having the different original datasets sketched
+together in one run.
+Therefore, big reference datasets can be broken down and sketched in parallel.
 
 ## Limitations
 
