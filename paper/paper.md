@@ -244,7 +244,9 @@ which means fewer than 100 hashes.
 With the default scale of 100, it means on average less than one
 hash for a 100-base sequence.
 Using a binomial proportion error estimation
-$\sigma = \sqrt{\frac{J(J-1)}{|A_{sub} \cap B_{sub}|}}$,
+$\sigma_{err} = \sqrt{\frac{J(J-1)}{|A_{sub} \cap B_{sub}|}}$,
+where $J$ is the true Jaccard similarity and
+$A_{sub}$ and $B_{sub}$ are the subsamples of sets $A$ and $B$,
 a subsample of at least 25 k-mers is required in order to reduce
 the Jaccard estimation error below 10%.
 Therefore, Blini is effective for sequences at least 25 times
