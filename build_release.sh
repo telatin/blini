@@ -3,7 +3,7 @@
 set -e
 
 EXE=blini
-VERSION=v0.3.1
+VERSION=v0.4.0
 OUTDIR=../release
 FLAGS="-ldflags=-s -X main.version=$VERSION"
 
