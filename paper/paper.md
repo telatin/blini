@@ -34,13 +34,22 @@ with no need to install any additional software.
 
 Metagenomes are collections of genetic material from various organisms,
 which are often not initially known.
-Characterizing the taxonomic makeup of a sample involves searching
-its contents in large databases in order to find which organism
-matches each nucleotide sequence.
+In modern metagenomics, researchers often generate hundreds of thousands of
+redundant metagenome-assembled genomes (MAGs) across different samples.
+In [@pasolli2019extensive] for example, over 150,000 MAGs were
+de-replicated into about 5,000 species-level bins.
+Such clustering operations typically require many compute hours,
+which can grow quadratically with the size of the input,
+when using classical clustering algorithms.
+
+Characterizing the taxonomic makeup of a sample or a MAG collection
+involves searching its contents in large databases in order to find
+which organism matches each nucleotide sequence.
 Assembled sequences can reach lengths of millions of bases,
 making alignment-based search methods too cumbersome.
 Such big queries are often outsourced to powerful cloud-based
-services such as BLAST [@altschul1990basic].
+services such as BLAST [@altschul1990basic] or CZID [@simmonds2024cz].
+
 In recent years, k-mer-based algorithms were introduced,
 that enabled efficient searching in large datasets on local machines.
 Mash distance [@ondov2016mash] introduced an alignment-free estimation
@@ -53,7 +62,7 @@ The LinClust clustering algorithm [@steinegger2018clustering] uses
 k-mer matching reduce the number of pairwise comparisons and achieve
 linear scaling with the size of the input.
 
-Blini combines insights from Mash, Sourmash, and LinClust
+This work, Blini, combines insights from Mash, Sourmash, and LinClust
 into a simple tool that can quickly cluster or look up big collections
 of sequences using estimated identity or containment,
 with tweakable estimation resolution (similar to Sourmash's *scale*).
