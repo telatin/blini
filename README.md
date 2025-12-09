@@ -86,3 +86,12 @@ Therefore, big reference datasets can be broken down and sketched in parallel.
   will be added in the future.
 * No multi-threading at the moment.
   Still fast, innit?
+
+## Join the conversation
+
+Got a question? Feedback? Found a bug?
+
+Feel free to
+[open an issue](https://github.com/fluhus/blini/issues/new/choose)
+or
+[start a discussion](https://github.com/fluhus/blini/discussions/new/choose).
