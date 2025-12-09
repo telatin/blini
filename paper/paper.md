@@ -223,6 +223,8 @@ achieved an ARI of 0.999, 0.999, 0.998 and 0.989 with scales 25, 50, 100 and 200
 (Figure 4b).
 Blini grouped the dataset into 100, 104, 135 and 386 clusters,
 while MMseqs grouped the dataset into 101 clusters (Figure 4a).
+The decline in performance with increasing scale is discussed below
+under Limitations.
 Blini took on average 20 seconds, and MMseqs took 80 seconds with one
 thread, and 24 seconds with four threads (Figure 4c).
 In terms of memory, Blini had a maximal memory footprint of 462, 233, 119, and
