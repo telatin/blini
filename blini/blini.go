@@ -34,12 +34,16 @@ var (
 	minSim    = flag.Float64("m", 0.9, "Minimum similarity for match")
 	scale     = flag.Uint64("s", 100, "Use 1/`scale` of the kmers")
 	unmatched = flag.Bool("u", false, "Include unmatched queries in search output")
-
-	version = "development version"
+	showVer   = flag.Bool("version", false, "Print version and exit")
+	version   = "0.4.1"
 )
 
 func main() {
 	flag.Parse()
+	if *showVer {
+		fmt.Printf("Blini %s\n", version)
+		return
+	}
 	debug.SetGCPercent(20)
 
 	var err error
